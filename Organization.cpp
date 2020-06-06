@@ -19,9 +19,9 @@ Organization& Organization::operator=(const Organization& other) {
 
 
 void Organization::add_institution(Institution* i) {
-	if (invalid_institutions_enabled)
+	if (invalid_institutions_enabled || i->is_valid())
 		institutions.push_back(i);
-	else cout << "Adding invalid institutions is disabled! Use toggle_invalid_institutions to enable it.\n";
+	else cout << "Adding invalid institutions is disabled! Use toggle_invalid_institutions() to enable it.\n";
 }
 void Organization::toggle_invalid_institutions() {
 	invalid_institutions_enabled = !invalid_institutions_enabled;
@@ -76,7 +76,7 @@ bool Organization::has_member(const Person& person) const {
 }
 bool Organization::is_valid() const {
 	for (size_t i = 0; i < institutions.size(); ++i) {
-		if (dynamic_cast<Group*>(institutions[i])) return true;
+		if (!institutions[i]->is_valid()) return false;
 	}
-	return false;
+	return true;
 }

@@ -27,7 +27,7 @@ Institution* find_most_popular_institution(vector<Institution*> input) {
 }
 
 bool alianzrule(unsigned id1, unsigned id2) {
-	return (id1 + id2) % 10 == 0;
+	return (id1 + id2) % 10 == 5;
 }
 bool bulstradrule(unsigned id1, unsigned id2) {
 	return (id1 - id2) % 10 == 0;
@@ -37,18 +37,24 @@ int main() {
 	Payer alianz("Alianz", alianzrule);
 	Payer bulstrad("Alianz", bulstradrule);
 
-	Person ivan("Ivan Ivanov", 2046);
-	Person mitko("Mitko Dimitrov", 3046);
+	Person ivan("Ivan Ivanov", 15);
+	Person mitko("Mitko Dimitrov", 16);
 
 	Group g1("g1", 2020);
 	assert(g1.get_id() == 1); //institution_id != group_id
 	assert(g1.associated_payer() == nullptr);
-	Group g2("g2", 2021, &alianz);
-	assert(g2.associated_payer() == &alianz);
-	Group g3("g3", 2022, &bulstrad);
-	Group g4("g4", 2023, &alianz);
+	assert(!g1.is_valid());
+	assert(alianz.rule(2020, 15));
 
-	g1.add_member_by_id(2046);
+	Group g2("g2", 2022, &alianz);
+	assert(g2.is_valid());
+	assert(g2.associated_payer() == &alianz);
+	
+	Group g3("g3", 2023, &bulstrad);
+	Group g4("g4", 2024, &alianz);
+
+	g1.add_member_by_id(15);
+	g2.add_member_by_id(16);
 	assert(g1.has_member(ivan));
 
 	vector<Institution*> institutions;
@@ -62,13 +68,16 @@ int main() {
 	assert(o1.has_member(ivan)); //ivan is in g1 so he should be in o1
 	assert(o1.associated_payer() == &alianz);
 	assert(o1.get_id() == 5);
+	assert(!o1.is_valid());
 
 	Organization o2("o2", institutions2, "Mladost 6");
 	o2.add_institution(&g1); //print message to console, g1 should not be added
 	o2.toggle_invalid_institutions();
 	o2.add_institution(&g1); //g1 should be added
 	assert(o2.has_member(ivan));
-
+	
+	o2.add_institution(&g2); //contains mitko, so total users should be 2
+	assert(o2.associated_users_count() == 2);
 	institutions.push_back(&o1);
 
 	assert(o1.associated_payer() == &alianz);
